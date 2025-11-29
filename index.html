@@ -3,72 +3,129 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>五年级数学练习</title>
-<!-- MathJax CDN -->
+<title>五年级数学选择题测验</title>
+<!-- MathJax 用于公式渲染 -->
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
 <style>
 body {
-  font-family: "Comic Neue", sans-serif;
-  font-size: 14px; /* 小4号 */
-  background: url('https://d1csarkz8obe9u.cloudfront.net/posterpreviews/powerpoint-math-for-kids-background-design-template-9c7101e6f62f51589b70148f650f4f6e_screen.jpg?ts=1737411341') no-repeat center center fixed;
+  font-family: "ZCOOL KuaiLe", "Microsoft YaHei", sans-serif;
+  font-size: 18px; 
+  background: url('https://img.thuthuattinhoc.vn/uploads/2019/01/24/hinh-nen-nhung-ngoi-sao-nhieu-sac-mau-de-thuong_115836397.jpg') no-repeat center center fixed;
   background-size: cover;
   padding: 20px;
   color: #000;
+  overflow-x: hidden;
 }
+
+/* 主标题 */
 h1 {
-  font-size: 2rem;
+  font-size: 2.4rem;
   text-align: center;
   margin-bottom: 20px;
 }
+
+/* 页码 */
 #q-index {
-  font-size: 1.2rem;
-  margin-bottom: 12px;
-}
-#question {
   font-size: 1.6rem;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
+
+/* 浮现层：覆盖题目和选项 */
+#quiz-container {
+  background: rgba(255,255,255,0.85);
+  padding: 24px 28px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 20px rgba(255,255,255,0.2) inset;
+  backdrop-filter: blur(6px);
+  max-width: 900px;
+  margin: auto;
+  opacity: 0.8;
+  animation: fadeIn 0.8s forwards, floatUpDown 3s ease-in-out infinite alternate;
+}
+
+/* 渐显动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 轻微漂浮动画 */
+@keyframes floatUpDown {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-6px); }
+}
+
+/* 题目 */
+#question {
+  font-size: 2rem;
+  margin-bottom: 25px;
+}
+
+/* 选项浮现框 */
 .opt {
-  font-size: 1.5rem;
-  padding: 12px 18px;
-  margin-bottom: 14px;
-  border-radius: 12px;
-  border: 2px solid #d0d0d0;
-  background: rgba(255,255,255,0.9);
+  font-size: 2.1rem;
+  padding: 16px 22px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  border: 3px solid #d0d0d0;
+  background: rgba(255,255,255,0.95);
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.opt:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
 }
 .opt.correct { background: rgba(90, 220, 100,0.9); border-color: #56d56c; }
 .opt.wrong { background: rgba(255, 200, 200,0.9); border-color: #ff7b7b; }
-#nextBtn {
-  font-size: 1.4rem;
-  padding: 12px 24px;
+
+/* 按钮样式 */
+#nextBtn, #finishBtn {
+  font-size: 1.8rem;
+  padding: 14px 28px;
   background: #7dbbff;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
-  margin-top: 18px;
+  margin-top: 20px;
 }
+#finishBtn { display:none; }
 #restart {
-  font-size: 1.1rem;
-  padding: 6px 14px;
-  margin-left: 10px;
-}
-.score {
   font-size: 1.3rem;
-  margin-top: 12px;
+  padding: 8px 18px;
+  margin-left: 12px;
+}
+
+/* 分数和结果 */
+.score {
+  font-size: 1.6rem;
+  margin-top: 15px;
+}
+#result {
+  margin-top: 25px;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #1a1a1a;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
 }
 </style>
 </head>
 <body>
-<h1>五年级数学练习</h1>
-<div id="q-index">第 <span id="cur">1</span> / <span id="total">0</span> 题</div>
-<div id="question"></div>
-<div id="options"></div>
-<div class="controls">
-  <div class="score" id="score">得分：0</div>
-  <button id="nextBtn" disabled>下一题</button>
-  <button id="restart">重做</button>
+<h1>五年级数学选择题测验</h1>
+
+<div id="quiz-container">
+  <div id="q-index">第 <span id="cur">1</span> / <span id="total">0</span> 题</div>
+  <div id="question"></div>
+  <div id="options"></div>
+  <div class="controls">
+    <div class="score" id="score">得分：0</div>
+    <button id="nextBtn" disabled>下一题</button>
+    <button id="finishBtn">完成测验</button>
+    <button id="restart">重做</button>
+  </div>
+  <div id="result"></div>
 </div>
 
 <script>
@@ -78,32 +135,32 @@ const rawData = `
 2,6 个十万、3 个千和 8 个十组成的数目是： A. 630080 B. 603080 C. 603008 D. 630800,B
 3,下列哪项算式是正确的？ A. 45 + 15 X 2 = 120 B. (45 + 15) X 2 = 120 C. 45 + 15 X 2 = 90 D. 45 X 2 + 15 = 135,B
 4,19 是质数吗？为什么？ A. 是，因为它只能被 1 和 19 整除 B. 不是，因为它是奇数 C. 是，因为它比 10 大 D. 不是，因为它可以被 3 整除,A
-5,\\(3\\frac{1}{5} \\times 15\\) = A. 45 B. 46 C. 48 D. 50,C
+5,\\(3\\frac{1}{5} \\times 15\\) = A. 45 B. 46 C. 48 D. 50,A
 6,哪项的值最大？ A. \\(2.35 \\times 10\\) B. \\(0.235 \\times 100\\) C. \\(235 \\div 10\\) D. \\(2350 \\div 10\\),D
-7,4.08 - 1.9 = A. 2.18 B. 2.98 C. 3.18 D. 3.89,A
-8,把 \\(\\frac{17}{4}\\) 化为带分数。 A. \\(3\\frac{1}{4}\\) B. \\(4\\frac{1}{4}\\) C. \\(4\\frac{3}{4}\\) D. \\(5\\frac{1}{4}\\),B
+7,4.08 - 1.9 = A. 2.18 B. 2.98 C. 3.18 D. 3.89,C
+8,把 \\(\\frac{17}{4}\\) 化为带分数。 A. \\(3\\frac{1}{4}\\) B. \\(4\\frac{1}{4}\\) C. \\(4\\frac{3}{4}\\) D. \\(5\\frac{1}{4}\\),C
 9,480 的 15% 是多少？ A. 48 B. 60 C. 72 D. 84,C
 10,哥哥有 RM 850，弟弟的钱是哥哥的 \\(\\frac{1}{2}\\)。两人共有多少钱？ A. RM 425 B. RM 1200 C. RM 1275 D. RM 1700,C
 11,爸爸投资了 RM 20000，一年后获得 5% 的红利。爸爸共获得多少红利？ A. RM 100 B. RM 200 C. RM 1000 D. RM 2000,C
 12,一台电脑售价 RM 3400，分期付款 10 个月。每个月需付多少钱？ A. RM 34 B. RM 304 C. RM 340 D. RM 3400,C
-13,RM 100 - RM 23.40 - 85 sen = A. RM 75.75 B. RM 76.60 C. RM 76.75 D. RM 77.45,A
+13,RM 100 - RM 23.40 - 85 sen = A. RM 75.75 B. RM 76.60 C. RM 76.75 D. RM 77.45,C
 14,\\(\\frac{3}{5}\\) 个世纪等于多少年？ A. 30 年 B. 50 年 C. 60 年 D. 300 年,C
-15,14 年 7 个月 + 3 年 9 个月 = A. 17 年 6 个月 B. 18 年 4 个月 C. 18 年 6 个月 D. 19 年 4 个月,B
+15,14 年 7 个月 + 3 年 9 个月 = A. 17 年 6 个月 B. 18 年 4 个月 C. 18 年 6 个月 D. 19 年 4 个月,C
 16,现在的时刻是 10:45 a.m.，35 分钟后的时刻是： A. 11:10 a.m. B. 11:15 a.m. C. 11:20 a.m. D. 11:25 a.m.,C
 17,2.6 小时等于多少分钟？ A. 126 分钟 B. 136 分钟 C. 156 分钟 D. 260 分钟,C
-18,5 km 40 m - 2.8 km = A. 2.24 km B. 2.6 km C. 224 m D. 2600 m,A
+18,5 km 40 m - 2.8 km = A. 2.24 km B. 2.6 km C. 2240 m D. 2600 m,A
 19,一袋米的质量是 10 kg。妈妈用了其中的 20%。妈妈用了多少 g 的米？ A. 2 g B. 200 g C. 2000 g D. 8000 g,C
-20,3 x 1.45 kg = A. 3450 g B. 4350 g C. 4500 g D. 5350 g,A
-21,一瓶果汁有 1.5 L。哥哥喝了 350 ml，还剩下多少 ml？ A. 1150 ml B. 1250 ml C. 1350 ml D. 1450 ml,A
+20,3 x 1.45 kg = A. 3450 g B. 4350 g C. 4500 g D. 5350 g,C
+21,一瓶果汁有 1.5 L。哥哥喝了 350 ml，还剩下多少 ml？ A. 1150 ml B. 1250 ml C. 1350 ml D. 1450 ml,B
 22,正八边形有多少条对称轴？ A. 6 B. 7 C. 8 D. 10,C
 23,一个长方形的长是 12 cm，宽是 5 cm。计算它的周长。 A. 17 cm B. 34 cm C. 60 cm D. 120 cm,B
 24,下图显示一个正方体，体积是 27 cm^3。该正方体的一个面的面积是多少？ A. 3 cm^2 B. 6 cm^2 C. 9 cm^2 D. 27 cm^2,C
 25,两个正方体的体积总和是 129 cm^3。其中一个正方体的体积是 65 cm^3，另一个正方体的体积是多少？ A. 54 cm^3 B. 64 cm^3 C. 74 cm^3 D. 194 cm^3,B
 26,坐标平面上，原点的坐标是： A. (1, 1) B. (0, 1) C. (1, 0) D. (0, 0),D
-27,班上男生人数和女生人数的比是 3:4。如果女生有 20 人，男生有多少人？ A. 12 B. 15 C. 16 D. 25,B
+27,班上男生人数和女生人数的比是 3:4。如果女生有 20 人，男生有多少人？ A. 12 B. 15 C. 16 D. 25,A
 28,5 支钢笔的价格是 RM 40。8 支同样的钢笔价格是多少？ A. RM 56 B. RM 60 C. RM 64 D. RM 72,C
-29,一组数据：5, 12, 5, 8, 10。这组数据的中位数 (Median) 是多少？ A. 5 B. 8 C. 9 D. 10,B
-30,四个数目的平均数是 20。如果加入一个数目 30，新的平均数是多少？ A. 20 B. 22 C. 24 D. 25,B
+29,一组数据：5, 12, 5, 8, 10。这组数据的中位数 (Median) 是多少？ A. 5 B. 8 C. 9 D. 10,C
+30,四个数目的平均数是 20。如果加入一个数目 30，新的平均数是多少？ A. 20 B. 22 C. 24 D. 25,C
 `;
 
 // ====== 解析 CSV ======
@@ -131,6 +188,8 @@ document.getElementById('total').textContent = data.length;
 function loadQuestion(){
   answered=false;
   document.getElementById('nextBtn').disabled = true;
+  document.getElementById('finishBtn').style.display = 'none';
+  document.getElementById('result').textContent = '';
   const q = data[current];
   document.getElementById('question').innerHTML = q.q;
   document.getElementById('cur').textContent = current+1;
@@ -140,12 +199,11 @@ function loadQuestion(){
   q.options.forEach((opt,i)=>{
     const div = document.createElement('div');
     div.className='opt';
-    div.innerHTML = opt; // 支持 LaTeX
+    div.innerHTML = opt;
     div.addEventListener('click',()=>selectOption(div,i));
     optsDiv.appendChild(div);
   });
 
-  // 渲染 LaTeX
   MathJax.typesetPromise();
 }
 
@@ -155,24 +213,35 @@ function selectOption(el,index){
   const q = data[current];
   const all = document.querySelectorAll('.opt');
   all.forEach((d,i)=>{ if(i===q.answer) d.classList.add('correct'); });
-  if(index!==q.answer) el.classList.add('wrong'); else score++;
-  document.getElementById('score').textContent='得分：'+score;
-  document.getElementById('nextBtn').disabled=false;
+  if(index!==q.answer) el.classList.add('wrong');
+  else score++;
+  document.getElementById('score').textContent='得分：'+score+' / '+data.length;
+
+  if(current === data.length-1){
+    document.getElementById('finishBtn').style.display='inline-block';
+    document.getElementById('nextBtn').style.display='none';
+  } else {
+    document.getElementById('nextBtn').disabled=false;
+  }
 }
 
 document.getElementById('nextBtn').addEventListener('click',()=>{
   current++;
-  if(current>=data.length){
-    alert('测验结束！ 总得分：' + score);
-    return;
-  }
   loadQuestion();
 });
+
+document.getElementById('finishBtn').addEventListener('click',()=>{
+  document.getElementById('result').textContent = `🎉 太棒啦！你完成了测验，总得分：${score} / ${data.length} 💪 继续努力，让自己更棒！🌟`;
+  document.getElementById('finishBtn').style.display='none';
+});
+
 document.getElementById('restart').addEventListener('click',()=>{
   if(confirm('确定重做测验吗？')){
     current=0;
     score=0;
-    document.getElementById('score').textContent='得分：0';
+    document.getElementById('score').textContent='得分：0 / '+data.length;
+    document.getElementById('nextBtn').style.display='inline-block';
+    document.getElementById('nextBtn').disabled=true;
     loadQuestion();
   }
 });
@@ -181,5 +250,3 @@ loadQuestion();
 </script>
 </body>
 </html>
-
-
